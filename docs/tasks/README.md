@@ -1,5 +1,9 @@
 # Roadmap de Desenvolvimento e Matriz de Paralelismo: Organiza+
 
+> [!IMPORTANT]
+> **DIRETRIZ DE ENGENHARIA MANDATÓRIA (TDD):**  
+> Todas as tarefas abaixo devem ser executadas obrigatoriamente seguindo o ciclo **TDD (Test-Driven Development: Red-Green-Refactor)**. Nenhuma implementação de regra de negócio, validação, componente ou endpoint deve ser entregue sem os testes correspondentes (unitários ou funcionais). Consulte o documento [`docs/product/product_DIRETRIZES-DE-TESTES-E-TDD.md`](../product/product_DIRETRIZES-DE-TESTES-E-TDD.md).
+
 Este documento apresenta a decomposição técnica do sistema **Organiza+** em tarefas atômicas e rastreáveis para execução pela equipe de engenharia.
 
 ---
