@@ -10,6 +10,12 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+const ClientsController = () => import('#controllers/clients_controller')
+const DiaristasController = () => import('#controllers/diaristas_controller')
+const ServiceTypesController = () => import('#controllers/service_types_controller')
+const AgendaController = () => import('#controllers/agenda_controller')
+const AppointmentsController = () => import('#controllers/appointments_controller')
+const AiChatController = () => import('#controllers/ai_chat_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -21,6 +27,7 @@ router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
         router.post('login', [controllers.AccessTokens, 'store'])
+        router.get('me', [controllers.Profile, 'show']).use(middleware.auth())
       })
       .prefix('auth')
       .as('auth')
@@ -35,3 +42,50 @@ router
       .use(middleware.auth())
   })
   .prefix('/api/v1')
+
+router
+  .group(() => {
+    for (const [path, controller] of [
+      ['clients', ClientsController],
+      ['diaristas', DiaristasController],
+      ['service-types', ServiceTypesController],
+    ] as const) {
+      router.get(path, [controller, 'index'])
+      router.get(`${path}/:id`, [controller, 'show'])
+      router.post(path, [controller, 'store']).use(middleware.role(['ADMIN']))
+      router.put(`${path}/:id`, [controller, 'update']).use(middleware.role(['ADMIN']))
+      router.delete(`${path}/:id`, [controller, 'destroy']).use(middleware.role(['ADMIN']))
+    }
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
+
+router
+  .group(() => {
+    router.post('appointments', [AppointmentsController, 'store']).use(middleware.role(['ADMIN']))
+    router.patch('appointments/:id/status', [AppointmentsController, 'changeStatus'])
+    router
+      .post('appointments/:id/rating', [AppointmentsController, 'rate'])
+      .use(middleware.role(['ADMIN']))
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
+
+router
+  .group(() => {
+    router.get('agenda', [AgendaController, 'index'])
+    router
+      .post('agenda/check-availability', [AgendaController, 'checkAvailability'])
+      .use(middleware.role(['ADMIN']))
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
+
+router
+  .group(() => {
+    router.post('message', [AiChatController, 'message'])
+    router.post('confirm', [AiChatController, 'confirm'])
+  })
+  .prefix('/api/v1/ai/chat')
+  .use(middleware.auth())
+  .use(middleware.role(['ADMIN']))
