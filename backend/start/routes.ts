@@ -21,6 +21,7 @@ router
       .group(() => {
         router.post('signup', [controllers.NewAccount, 'store'])
         router.post('login', [controllers.AccessTokens, 'store'])
+        router.get('me', [controllers.Profile, 'show']).use(middleware.auth())
       })
       .prefix('auth')
       .as('auth')

@@ -5,23 +5,22 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
-      table
-        .integer('tokenable_id')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
+      table.uuid('id').primary()
+      table.uuid('tokenable_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
+      table.string('type', 50).notNullable()
+      table.string('name', 100).notNullable()
+      table.string('hash', 255).notNullable().unique()
+      table.jsonb('abilities').nullable()
+      table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
+      table.timestamp('updated_at', { useTz: true }).nullable()
+      table.timestamp('last_used_at', { useTz: true }).nullable()
+      table.timestamp('expires_at', { useTz: true }).nullable()
+    })
 
-      table.string('type').notNullable()
-      table.string('name').nullable()
-      table.string('hash').notNullable()
-      table.text('abilities').notNullable()
-      table.timestamp('created_at')
-      table.timestamp('updated_at')
-      table.timestamp('last_used_at').nullable()
-      table.timestamp('expires_at').nullable()
+    this.defer(async (db) => {
+      await db.rawQuery(
+        'ALTER TABLE auth_access_tokens ALTER COLUMN id SET DEFAULT gen_random_uuid()'
+      ).exec()
     })
   }
 

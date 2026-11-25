@@ -8,21 +8,10 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = [
-    'abilities',
-    'createdAt',
-    'expiresAt',
-    'hash',
-    'id',
-    'lastUsedAt',
-    'name',
-    'tokenableId',
-    'type',
-    'updatedAt',
-  ] as const
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
-  declare abilities: string
+  declare abilities: string[] | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
   @column.dateTime()
@@ -30,32 +19,34 @@ export class AuthAccessTokenSchema extends BaseModel {
   @column()
   declare hash: string
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
   @column.dateTime()
   declare lastUsedAt: DateTime | null
   @column()
-  declare name: string | null
+  declare name: string
   @column()
-  declare tokenableId: number
+  declare tokenableId: string
   @column()
   declare type: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
+  static $columns = ['active', 'createdAt', 'email', 'id', 'name', 'passwordHash', 'role', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare email: string
   @column()
-  declare fullName: string | null
+  declare name: string
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
   @column({ serializeAs: null })
-  declare password: string
+  declare passwordHash: string
+  @column()
+  declare role: 'ADMIN' | 'DIARISTA'
+  @column()
+  declare active: boolean
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
