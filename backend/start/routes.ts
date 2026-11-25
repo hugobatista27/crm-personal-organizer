@@ -14,6 +14,7 @@ const ClientsController = () => import('#controllers/clients_controller')
 const DiaristasController = () => import('#controllers/diaristas_controller')
 const ServiceTypesController = () => import('#controllers/service_types_controller')
 const AgendaController = () => import('#controllers/agenda_controller')
+const AppointmentsController = () => import('#controllers/appointments_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -54,6 +55,17 @@ router
       router.put(`${path}/:id`, [controller, 'update']).use(middleware.role(['ADMIN']))
       router.delete(`${path}/:id`, [controller, 'destroy']).use(middleware.role(['ADMIN']))
     }
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
+
+router
+  .group(() => {
+    router.post('appointments', [AppointmentsController, 'store']).use(middleware.role(['ADMIN']))
+    router.patch('appointments/:id/status', [AppointmentsController, 'changeStatus'])
+    router
+      .post('appointments/:id/rating', [AppointmentsController, 'rate'])
+      .use(middleware.role(['ADMIN']))
   })
   .prefix('/api/v1')
   .use(middleware.auth())
