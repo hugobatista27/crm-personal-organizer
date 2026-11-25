@@ -100,12 +100,13 @@ async function recordStatusChange(
 
 export async function createAppointment(
   input: NewAppointment,
-  actor: Actor
+  actor: Actor,
+  transaction?: TransactionClientContract
 ): Promise<AppointmentResult> {
   validateSlot(input.service_date, input.start_time, input.end_time)
   const id = randomUUID()
   try {
-    return await db.transaction(async (trx) => {
+    const insert = async (trx: TransactionClientContract): Promise<AppointmentResult> => {
       const [row] = await trx
         .insertQuery<AppointmentRow>()
         .table('appointments')
@@ -132,7 +133,8 @@ export async function createAppointment(
         .returning('*')
       await recordStatusChange(trx, id, null, 'SOLICITADO', actor.id)
       return { data: row }
-    })
+    }
+    return transaction ? await insert(transaction) : await db.transaction(insert)
   } catch (error) {
     const code = databaseCode(error)
     if (code === '23503') invalid('Cliente, diarista ou serviço informado não existe.')

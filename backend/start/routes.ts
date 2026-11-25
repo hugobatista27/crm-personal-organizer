@@ -15,6 +15,7 @@ const DiaristasController = () => import('#controllers/diaristas_controller')
 const ServiceTypesController = () => import('#controllers/service_types_controller')
 const AgendaController = () => import('#controllers/agenda_controller')
 const AppointmentsController = () => import('#controllers/appointments_controller')
+const AiChatController = () => import('#controllers/ai_chat_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -79,3 +80,12 @@ router
   })
   .prefix('/api/v1')
   .use(middleware.auth())
+
+router
+  .group(() => {
+    router.post('message', [AiChatController, 'message'])
+    router.post('confirm', [AiChatController, 'confirm'])
+  })
+  .prefix('/api/v1/ai/chat')
+  .use(middleware.auth())
+  .use(middleware.role(['ADMIN']))

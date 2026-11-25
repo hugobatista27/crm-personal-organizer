@@ -4,7 +4,7 @@ import { appointmentStatuses } from '#models/appointment'
 const uuid = () => vine.string().uuid()
 const time = () => vine.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/)
 
-export const createAppointmentValidator = vine.create({
+export const appointmentFields = {
   client_id: uuid(),
   diarista_id: uuid().optional(),
   service_type_id: uuid(),
@@ -16,7 +16,9 @@ export const createAppointmentValidator = vine.create({
   additional_costs: vine.number().min(0).optional(),
   address_snapshot: vine.string().trim().minLength(1),
   observations: vine.string().optional(),
-})
+}
+
+export const createAppointmentValidator = vine.create(appointmentFields)
 
 export const transitionAppointmentValidator = vine.create({
   status: vine.enum(appointmentStatuses),
