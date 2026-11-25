@@ -10,6 +10,9 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
 import { controllers } from '#generated/controllers'
+const ClientsController = () => import('#controllers/clients_controller')
+const DiaristasController = () => import('#controllers/diaristas_controller')
+const ServiceTypesController = () => import('#controllers/service_types_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -36,3 +39,20 @@ router
       .use(middleware.auth())
   })
   .prefix('/api/v1')
+
+router
+  .group(() => {
+    for (const [path, controller] of [
+      ['clients', ClientsController],
+      ['diaristas', DiaristasController],
+      ['service-types', ServiceTypesController],
+    ] as const) {
+      router.get(path, [controller, 'index'])
+      router.get(`${path}/:id`, [controller, 'show'])
+      router.post(path, [controller, 'store']).use(middleware.role(['ADMIN']))
+      router.put(`${path}/:id`, [controller, 'update']).use(middleware.role(['ADMIN']))
+      router.delete(`${path}/:id`, [controller, 'destroy']).use(middleware.role(['ADMIN']))
+    }
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
