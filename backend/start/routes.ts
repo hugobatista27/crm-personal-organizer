@@ -13,6 +13,7 @@ import { controllers } from '#generated/controllers'
 const ClientsController = () => import('#controllers/clients_controller')
 const DiaristasController = () => import('#controllers/diaristas_controller')
 const ServiceTypesController = () => import('#controllers/service_types_controller')
+const AgendaController = () => import('#controllers/agenda_controller')
 
 router.get('/', () => {
   return { hello: 'world' }
@@ -53,6 +54,16 @@ router
       router.put(`${path}/:id`, [controller, 'update']).use(middleware.role(['ADMIN']))
       router.delete(`${path}/:id`, [controller, 'destroy']).use(middleware.role(['ADMIN']))
     }
+  })
+  .prefix('/api/v1')
+  .use(middleware.auth())
+
+router
+  .group(() => {
+    router.get('agenda', [AgendaController, 'index'])
+    router
+      .post('agenda/check-availability', [AgendaController, 'checkAvailability'])
+      .use(middleware.role(['ADMIN']))
   })
   .prefix('/api/v1')
   .use(middleware.auth())
